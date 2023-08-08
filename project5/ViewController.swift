@@ -65,7 +65,6 @@ class ViewController: UITableViewController {
         if isPossible(word) {
             if isOriginal(word) {
                 if isReal(word) {
-                    
                     usedWords.insert(answer, at: 0)
                     
                     let indexPath = IndexPath(row: 0, section: 0)
@@ -76,15 +75,27 @@ class ViewController: UITableViewController {
     }
     
     func isPossible(_ word: String) -> Bool {
+        guard var titleWord = title?.lowercased() else { return false }
+        
+        for char in word {
+            if let indexOfChar = titleWord.firstIndex(of: char) {
+                titleWord.remove(at: indexOfChar)
+            } else {
+                return true
+            }
+        }
         return true
     }
     
     func isOriginal(_ word: String) -> Bool {
-        return true
+        return !usedWords.contains(word)
     }
 
     func isReal(_ word: String) -> Bool {
-        return true
+        let checker = UITextChecker()
+        let range = NSRange(location: 0, length: word.count)
+        let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        return misspelledRange.location == NSNotFound
     }
 }
 
