@@ -62,32 +62,26 @@ class ViewController: UITableViewController {
     func submit(_ answer: String) {
         let word = answer.lowercased()
         
-        let alertTitle: String
-        let alertMessage: String
-        
         if isPossible(word) {
             if isOriginal(word) {
                 if isReal(word) {
                     usedWords.insert(answer, at: 0)
-                    
                     let indexPath = IndexPath(row: 0, section: 0)
                     tableView.insertRows(at: [indexPath], with: .automatic)
-
-                    return
+                    
                 } else {
-                    alertTitle = "Word not recognized"
-                    alertMessage = "You can't just make them up, you know!"
+                    showAlert("Word not recognized", "You can't just make them up, you know!")
                 }
             } else {
-                alertTitle = "Word have already used"
-                alertMessage = "Be more original!"
+                showAlert("Word have already used", "Be more original!")
             }
         } else {
             guard let title = title?.lowercased() else { return }
-            alertTitle = "Word not possible"
-            alertMessage = "You can't spell that word from \(title)"
+            showAlert("Word not possible", "You can't spell that word from \(title)")
         }
-        
+    }
+    
+    func showAlert(_ alertTitle: String, _ alertMessage: String) {
         let ac = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
@@ -95,6 +89,7 @@ class ViewController: UITableViewController {
     
     func isPossible(_ word: String) -> Bool {
         guard var titleWord = title?.lowercased() else { return false }
+        guard titleWord != word else { return false }
         
         for char in word {
             if let indexOfChar = titleWord.firstIndex(of: char) {
@@ -111,6 +106,7 @@ class ViewController: UITableViewController {
     }
 
     func isReal(_ word: String) -> Bool {
+        guard word.count > 2 else { return false }
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.count)
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
