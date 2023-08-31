@@ -28,6 +28,17 @@ class ViewController: UITableViewController {
             allWords = ["TryAgain"]
         }
         startGame()
+        
+        let defaults = UserDefaults.standard
+        if let data = defaults.object(forKey: "titleWord") as? Data {
+            let jsonDecoder = JSONDecoder()
+            title = try? jsonDecoder.decode(String.self, from: data)
+            if let data2 = defaults.object(forKey: "usedWords") as? Data {
+                if let words = try? jsonDecoder.decode([String].self, from: data2) {
+                    usedWords = words
+                }
+            }
+        }
     }
     
     @objc func startGame(){
@@ -113,6 +124,10 @@ class ViewController: UITableViewController {
         let range = NSRange(location: 0, length: word.count)
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         return misspelledRange.location == NSNotFound
+    }
+    
+    func saveWords() {
+        let jsonEncoder = JSONEncoder()
     }
 }
 
