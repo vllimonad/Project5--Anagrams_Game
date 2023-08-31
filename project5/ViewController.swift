@@ -27,7 +27,6 @@ class ViewController: UITableViewController {
         if allWords.isEmpty {
             allWords = ["TryAgain"]
         }
-        startGame()
         
         let defaults = UserDefaults.standard
         if let data = defaults.object(forKey: "titleWord") as? Data {
@@ -38,6 +37,8 @@ class ViewController: UITableViewController {
                     usedWords = words
                 }
             }
+        } else {
+            startGame()
         }
     }
     
@@ -45,6 +46,7 @@ class ViewController: UITableViewController {
         title = allWords.randomElement()
         usedWords.removeAll()
         tableView.reloadData()
+        saveWords()
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -81,7 +83,7 @@ class ViewController: UITableViewController {
                     usedWords.insert(answer, at: 0)
                     let indexPath = IndexPath(row: 0, section: 0)
                     tableView.insertRows(at: [indexPath], with: .automatic)
-                    
+                    saveWords()
                 } else {
                     showAlert("Word not recognized", "You can't just make them up, you know!")
                 }
@@ -128,6 +130,14 @@ class ViewController: UITableViewController {
     
     func saveWords() {
         let jsonEncoder = JSONEncoder()
+        
+        if let data = try? jsonEncoder.encode(title) {
+            let defaults = UserDefaults.standard
+            defaults.set(data, forKey: "titleWord")
+            if let data2 = try? jsonEncoder.encode(usedWords) {
+                defaults.set(data2, forKey: "usedWords")
+            }
+        }
     }
 }
 
